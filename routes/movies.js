@@ -16,32 +16,33 @@ const {
   deletetItem,
 } = require("../controllers/moviesController");
 
-
 //TODO se crea un crud para la colección movies
 
-
-router.get("/",refreshToken ,getItems, );
-router.get("/:id",refreshToken ,validatorGetItem, getItem);
+router.get("/", getItems, refreshToken);
+router.get("/:id", validatorGetItem, getItem, refreshToken);
 router.post(
-  "/", refreshToken,
+  "/",
   authMiddleware,
   checkRol(["admin"]),
   validatorCreateItem,
-  createItem
+  createItem,
+  refreshToken
 );
 router.put(
-  "/:id",refreshToken,
+  "/:id",
   authMiddleware,
   checkRol(["admin"]),
   validatorGetItem,
-  updateItem
+  updateItem,
+  refreshToken
 );
 router.delete(
-  "/:id", refreshToken,
+  "/:id",
   authMiddleware,
   checkRol(["admin"]),
   validatorGetItem,
-  deletetItem
+  deletetItem,
+  refreshToken
 );
 
 module.exports = router;
