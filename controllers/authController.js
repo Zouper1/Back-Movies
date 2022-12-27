@@ -46,10 +46,7 @@ const loginCtr = async (req, res) => {
     };
 
     res.cookie(String(data.user._id), data.token, {
-      path: "/",
-      expires: new Date(Date.now() + 900000),
-      httpOnly: true,
-      sameSite: "lax",
+      maxAge: 900000, httpOnly: true
     });
 
     res.send({ data, message: "Bienvenido" });

@@ -6,7 +6,7 @@ const { validatorRegister, validatorLogin } = require("../validators/authV");
 
 
 router.post("/register", validatorRegister, registerCtr);
-router.post("/login", validatorLogin,loginCtr, refreshToken);
+router.post("/login", validatorLogin,loginCtr);
 router.get("/logout", logoutCtr);
 
 

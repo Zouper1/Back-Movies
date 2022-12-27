@@ -18,15 +18,15 @@ const {
 
 //TODO se crea un crud para la colección movies
 
-router.get("/", getItems, refreshToken);
-router.get("/:id", validatorGetItem, getItem, refreshToken);
+router.get("/", getItems);
+router.get("/:id", validatorGetItem, getItem, );
 router.post(
   "/",
   authMiddleware,
   checkRol(["admin"]),
   validatorCreateItem,
   createItem,
-  refreshToken
+  
 );
 router.put(
   "/:id",
@@ -34,7 +34,7 @@ router.put(
   checkRol(["admin"]),
   validatorGetItem,
   updateItem,
-  refreshToken
+  
 );
 router.delete(
   "/:id",
@@ -42,7 +42,7 @@ router.delete(
   checkRol(["admin"]),
   validatorGetItem,
   deletetItem,
-  refreshToken
+  
 );
 
 module.exports = router;
