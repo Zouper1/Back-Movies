@@ -6,6 +6,7 @@ const {
 } = require("../validators/moviesV");
 const authMiddleware = require("../middleware/sesionM");
 const { checkRol } = require("../middleware/rol");
+const { refreshToken } = require("../controllers/authController");
 
 const {
   getItems,
@@ -15,27 +16,28 @@ const {
   deletetItem,
 } = require("../controllers/moviesController");
 
+
 //TODO se crea un crud para la colección movies
 
-router.get("/", getItems);
-router.get("/:id", validatorGetItem, getItem);
+
+router.get("/",refreshToken ,getItems, );
+router.get("/:id",refreshToken ,validatorGetItem, getItem);
 router.post(
-  "/",
+  "/", refreshToken,
   authMiddleware,
   checkRol(["admin"]),
   validatorCreateItem,
   createItem
 );
 router.put(
-  "/:id",
+  "/:id",refreshToken,
   authMiddleware,
   checkRol(["admin"]),
   validatorGetItem,
-  validatorCreateItem,
   updateItem
 );
 router.delete(
-  "/:id",
+  "/:id", refreshToken,
   authMiddleware,
   checkRol(["admin"]),
   validatorGetItem,

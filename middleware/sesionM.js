@@ -1,20 +1,20 @@
-const { haddleHttpError } = require('../utils/haddleError');
-const { tokenVerify } = require('../utils/handleJwt');
-const { usersModel } = require('../models');
+const { haddleHttpError } = require("../utils/haddleError");
+const { tokenVerify } = require("../utils/handleJwt");
+const { usersModel } = require("../models");
 
-const authMiddleware = async (req, res, next) =>{
-
+const authMiddleware = async (req, res, next) => {
   try {
+    const cookies = req.headers.cookie;
+    const token = cookies.split("=")[1];
 
-    if(!req.headers.authorization){
+    if (!token) {
       haddleHttpError(res, "NOT_TOKEN", 401);
       return;
     }
 
-    const token = req.headers.authorization.split(" ").pop()
     const dataToken = await tokenVerify(token);
 
-    if(!dataToken._id){
+    if (!dataToken._id) {
       haddleHttpError(res, "ERROR_ID_TOKEN", 401);
       return;
     }
@@ -23,11 +23,9 @@ const authMiddleware = async (req, res, next) =>{
     req.user = user;
 
     next();
-    
   } catch (error) {
-    haddleHttpError(res, "NOT_SESSION", 401);
-    
+    haddleHttpError(res, "NOT_SESSION_ERROR", 401);
   }
-}
+};
 
 module.exports = authMiddleware;

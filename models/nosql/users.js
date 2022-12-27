@@ -13,11 +13,17 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
       select: false,
+     
     },
     role: {
-      type: ["admin", "user"],
+      type: String,
+      enum: ["admin", "user"], //asigna los roles que puede tener el usuario
       default: "user",
     },
+    credits: {
+      type: Number,
+      default: 300,
+    }
   },
   {
     timestamps: false, //TODO añade createdAt y updatedAt

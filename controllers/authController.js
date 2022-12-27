@@ -6,7 +6,6 @@ const { haddleHttpError } = require("../utils/haddleError");
 
 const registerCtr = async (req, res) => {
   try {
-    
     req = matchedData(req);
     const password = await encrypt(req.password);
     const body = { ...req, password };
@@ -18,38 +17,109 @@ const registerCtr = async (req, res) => {
     };
     res.send({ data });
   } catch (error) {
-    haddleHttpError(res, "ERROR_REGISTER_USER", 500);
-    
+    haddleHttpError(res, "El correo ya esta registrado", 500);
   }
 };
 
 const loginCtr = async (req, res) => {
-try {
-  req = matchedData(req);
-  const user = await usersModel.findOne({ email: req.email }).select("password name role email");
-  if (!user) {
-    haddleHttpError(res, "USER_NOT_EXIST", 403);
-    return;
-  }
-  const hashPassword = user.get("password");
-  
-  const check = await compare(req.password, hashPassword);
+  try {
+    req = matchedData(req);
+    const user = await usersModel
+      .findOne({ email: req.email })
+      .select("password name role email");
+    if (!user) {
+      haddleHttpError(res, "Email no encontrado", 403);
+      return;
+    }
+    const hashPassword = user.get("password");
 
-  if (!check) {
-    haddleHttpError(res, "PASSWORD_NOT_MATCH", 401);
-    return;
-  }
-  user.set("password", undefined, { strict: false });
-  const data = {
-    token: await tokenSign(user),
-    user,
-  };
-  res.send({ data });
+    const check = await compare(req.password, hashPassword);
 
-} catch (e) {
-  
-  haddleHttpError(res, "ERROR_LOGIN_USER", 403);
-}
+    if (!check) {
+      haddleHttpError(res, "Contraseña Invalida", 403);
+      return;
+    }
+    user.set("password", undefined, { strict: false });
+    const data = {
+      token: await tokenSign(user),
+      user,
+    };
+
+    res.cookie(String(data.user._id), data.token, {
+      path: "/",
+      expires: new Date(Date.now() + 900000),
+      httpOnly: true,
+      sameSite: "lax",
+    });
+
+    res.send({ data, message: "Bienvenido" });
+  } catch (e) {
+    haddleHttpError(res, "ERROR_LOGIN_USER", 403);
+  }
 };
 
-module.exports = { loginCtr, registerCtr };
+const refreshToken = async (req, res, next) => {
+  try {
+    const cookies = req.headers.cookie;
+    const prevToken = cookies.split("=")[1];
+
+    if (!prevToken) {
+      haddleHttpError(res, "No se encontro el token ", 401);
+      return;
+    }
+
+    const dataToken = await tokenVerify(prevToken);
+
+    if (!dataToken._id) {
+      haddleHttpError(res, "No se encontro el id del token", 401);
+      return;
+    }
+
+    res.clearCookie(String(dataToken._id));
+    req.cookies[String(dataToken._id)] = "";
+
+    const token = await tokenSign(dataToken);
+
+    res.cookie(String(dataToken._id), token, {
+      path: "/",
+      expires: new Date(Date.now() + 900000),
+      httpOnly: true,
+      sameSite: "lax",
+    });
+
+    req.id = dataToken._id;
+    next(); 
+  } catch (error) {
+    haddleHttpError(res, "ERROR_REFRESH TOKEN", 403);
+  }
+
+
+};
+
+const logoutCtr = async (req, res) => {
+  try {
+    const cookies = req.headers.cookie;
+    const prevToken = cookies.split("=")[1];
+
+    if (!prevToken) {
+      haddleHttpError(res, "No se encontro el token ", 401);
+      return;
+    }
+
+    const dataToken = await tokenVerify(prevToken);
+
+    if (!dataToken._id) {
+      haddleHttpError(res, "No se encontro el id del token", 401);
+      return;
+    }
+
+    res.clearCookie(String(dataToken._id));
+    req.cookies[String(dataToken._id)] = "";
+
+    res.send({ data: "Sesion cerrada" });
+  } catch (error) {
+    haddleHttpError(res, "ERROR_LOGOUT_USER", 403);
+  }
+};
+
+module.exports = { loginCtr, registerCtr, refreshToken, logoutCtr };

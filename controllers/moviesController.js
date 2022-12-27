@@ -18,6 +18,10 @@ const getItem = async (req, res) => {
     req = matchedData(req);
     const { id } = req;
     const data = await moviesModel.findById(id);
+    if (!id) {
+      haddleHttpError(res, "No se encontro la ID", 403);
+      return;
+    }
     res.send({ data });
   } catch (error) {
     haddleHttpError(res, "ERROR_GET_ITEM", 403);
@@ -38,11 +42,19 @@ const createItem = async (req, res) => {
 //? actualizar un item en la base de datos
 const updateItem = async (req, res) => {
   try {
-    const { id, ...body } = matchedData(req);
-    const data = await moviesModel.findByIdAndUpdate(id, body, {
-      new: true, //TODO devuelve el objeto actualizado)
-    });
-    res.send({ data, message: "Item actualizado" });
+    const updatedMovies = await moviesModel.findByIdAndUpdate(req.params.id, {
+      $set: {
+        nameMovie: req.body.nameMovie, 
+        imageMovie: req.body.imageMovie,
+        descriptionMovie: req.body.descriptionMovie,
+        deleted:  req.body.deleted,
+        time1: req.body.time1,
+        time2: req.body.time2,
+        time3: req.body.time3,
+      },
+    }, { new: true });
+    
+    res.send({ data: updatedMovies, message: "Item actualizado" });
   } catch (error) {
     haddleHttpError(res, "ERROR_UPDATE_ITEMS", 403);
   }
@@ -54,6 +66,10 @@ const deletetItem = async (req, res) => {
     req = matchedData(req);
     const { id } = req;
     const data = await moviesModel.delete({ _id: id });
+    if (!id) {
+      haddleHttpError(res, "No se encontro la ID para eliminar", 403);
+      return;
+    }
     res.send({ data, message: "Item eliminado" });
   } catch (error) {
     haddleHttpError(res, "ERROR_DELETE_ITEMS", 403);

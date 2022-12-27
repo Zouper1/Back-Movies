@@ -11,16 +11,18 @@ const MoviesSchema = new mongoose.Schema(
       type: String,
     },
 
-    timesMovies: {
-      time1: {
-        type: String,
-      },
-      time2: {
-        type: String,
-      },
-      time3: {
-        type: String,
-      },
+    price: {
+      type: Number,
+    },
+
+    time1: {
+      type: String,
+    },
+    time2: {
+      type: String,
+    },
+    time3: {
+      type: String,
     },
 
     descriptionMovie: {
