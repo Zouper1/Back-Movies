@@ -54,7 +54,7 @@ const loginCtr = async (req, res) => {
     });
 
     res.send({ data, message: "Bienvenido" });
-    res.send(localStorage.setItem("token", data.token))
+    // res.send(localStorage.setItem("token", data.token))
   } catch (e) {
     haddleHttpError(res, "ERROR_LOGIN_USER", 403);
   }
@@ -90,7 +90,7 @@ const refreshToken = async (req, res, next) => {
     });
 
     req.id = dataToken._id;
-    req.localStorage.setItem("token", token)
+    // req.localStorage.setItem("token", token)
     next(); 
   } catch (error) {
     haddleHttpError(res, "ERROR_REFRESH TOKEN", 403);
