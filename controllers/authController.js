@@ -46,10 +46,15 @@ const loginCtr = async (req, res) => {
     };
 
     res.cookie(String(data.user._id), data.token, {
-      maxAge: 900000, httpOnly: true
+      path: "/",
+      maxAge: 900000,
+      expires: new Date(Date.now() + 900000),
+      httpOnly: true,
+      sameSite: "lax",
     });
 
     res.send({ data, message: "Bienvenido" });
+    res.send(localStorage.setItem("token", data.token))
   } catch (e) {
     haddleHttpError(res, "ERROR_LOGIN_USER", 403);
   }
@@ -85,6 +90,7 @@ const refreshToken = async (req, res, next) => {
     });
 
     req.id = dataToken._id;
+    req.localStorage.setItem("token", token)
     next(); 
   } catch (error) {
     haddleHttpError(res, "ERROR_REFRESH TOKEN", 403);
