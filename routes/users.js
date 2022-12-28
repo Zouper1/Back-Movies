@@ -5,10 +5,10 @@ const {
   getUsers,
   updateUser,
 } = require("../controllers/usersController");
-const { refreshToken } = require("../controllers/authController");
 
-router.get("/", refreshToken ,getUsers);
-router.get("/:id", refreshToken ,getUser);
-router.put("/:id",refreshToken ,updateUser);
+
+router.get("/" ,getUsers);
+router.get("/:id" ,getUser);
+router.put("/:id",updateUser);
 
 module.exports = router;
